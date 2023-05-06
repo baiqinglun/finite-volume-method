@@ -1,4 +1,5 @@
 #include "tool.h"
+#include "math.h"
 
 namespace myTool
 {

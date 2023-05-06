@@ -6,6 +6,7 @@
 #include<iostream>
 #include "tool/tool.h"
 #include "matplot/matplot.h"
+#include "math.h"
 
 namespace plt = matplot;
 
