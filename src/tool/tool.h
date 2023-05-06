@@ -14,6 +14,7 @@ namespace myTool
     void swap(vector_2d &a,const int k,const int pivrow,const int n);
     void printVector_1d(vector_1d &a);
     void solveBodyHeart(vector_2d &bodyHeart,const double  W,const double H,const int x_N,const int y_N);
+    void GaussSeidel(vector_2d &a,vector_1d &b,vector_1d &x, const double eps);
 }
 
 #endif

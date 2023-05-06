@@ -148,4 +148,33 @@ namespace myTool
             std::cout << "(" << bodyHeart[i][0] << "," << bodyHeart[i][1] << ")" << std::endl;
         };
     }
+
+    void GaussSeidel(vector_2d &a,vector_1d &b,vector_1d &x, const double eps)
+    {
+        int flag = 0,
+            iter = 0,
+            n = a.size();
+        double xold = 0.0,
+                sum = 0.0,
+                error = 0.0;
+        do
+        {
+            flag = 0;
+            iter ++;
+            std::cout << "第" << iter << "次迭代" << std::endl;
+            for(int i = 0; i < n; ++i)
+            {
+                xold = x[i];
+                sum = 0.0;
+                for(int j = 0; j < n; ++j)
+                {
+                    if(j != i) sum += a[i][j] * x[j];  
+                };
+                x[i] = (b[i] - sum) / a[i][i];
+                error = fabs(xold - x[i]) / x[i];
+                if(error >= eps){ flag = 1; }
+            };
+        }while(flag == 1);
+        std::cout << "迭代完成" << std::endl;
+    }
 }
