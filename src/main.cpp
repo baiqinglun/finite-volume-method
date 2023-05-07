@@ -7,6 +7,9 @@
 #include "tool/tool.h"
 #include "matplot/matplot.h"
 #include "math.h"
+#include <dbg.h>
+#include "spdlog/spdlog.h" // 日志打印
+#include "spdlog/sinks/basic_file_sink.h"  
 
 namespace plt = matplot;
 
@@ -26,6 +29,7 @@ private:
     vector_2d bodyHeart;
     vector_1d T,b;
     vector_2d Z;
+    std::shared_ptr<spdlog::logger> my_logger;
 public:
     TDHeat();
     ~TDHeat(){};
@@ -37,7 +41,7 @@ public:
 
 TDHeat::TDHeat():x_N(3),y_N(4),W(0.3),H(0.4),k(1000),q(500000),T_top(100)
 {
-
+    my_logger = spdlog::basic_logger_mt("sbasic_logger", "logs/basic.txt");
 }
 
 /**
@@ -82,6 +86,14 @@ void TDHeat::output()
     std::cout << "\t传热：" << q << std::endl;
     std::cout << "\t热导率：" << k << std::endl;
     std::cout << "\t顶部温度：" << T_top << std::endl;
+    my_logger->info("默认参数如下:");
+    my_logger->info("宽度：{}",W);
+    my_logger->info("高度：{}",H);
+    my_logger->info("方向网格数：{}",x_N);
+    my_logger->info("方向网格数：{}",y_N);
+    my_logger->info("传热：{}",q);
+    my_logger->info("热导率：{}",k);
+    my_logger->info("顶部温度：{}",T_top);
 }
 
 /**
@@ -228,7 +240,8 @@ void TDHeat::construction()
             std::cout << "出错" << std::endl;
         }
     };
-    myTool::printVector_2d(a,"填充后");
+    // myTool::printVector_2d(a,"填充后");
+    dbg(a);
     // T = myTool::solveGuauss(a,x_N*y_N);
     T.resize(x_N * y_N);
     double eps = 1e-6;

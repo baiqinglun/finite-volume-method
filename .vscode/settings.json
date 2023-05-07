@@ -73,6 +73,9 @@
         "xhash": "cpp",
         "xtree": "cpp",
         "*.tcc": "cpp",
-        "numbers": "cpp"
+        "numbers": "cpp",
+        "condition_variable": "cpp",
+        "cstdarg": "cpp",
+        "variant": "cpp"
     }
 }
