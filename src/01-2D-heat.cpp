@@ -7,9 +7,6 @@
 #include "tool/tool.h"
 #include "matplot/matplot.h"
 #include "math.h"
-#include <dbg.h>
-#include "spdlog/spdlog.h" // 日志打印
-#include "spdlog/sinks/basic_file_sink.h"  
 
 namespace plt = matplot;
 
@@ -29,7 +26,6 @@ private:
     vector_2d bodyHeart;
     vector_1d T,b;
     vector_2d Z;
-    std::shared_ptr<spdlog::logger> my_logger;
 public:
     TDHeat();
     ~TDHeat(){};
@@ -41,7 +37,7 @@ public:
 
 TDHeat::TDHeat():x_N(3),y_N(4),W(0.3),H(0.4),k(1000),q(500000),T_top(100)
 {
-    my_logger = spdlog::basic_logger_mt("sbasic_logger", "logs/basic.txt");
+
 }
 
 /**
@@ -86,14 +82,6 @@ void TDHeat::output()
     std::cout << "\t传热：" << q << std::endl;
     std::cout << "\t热导率：" << k << std::endl;
     std::cout << "\t顶部温度：" << T_top << std::endl;
-    my_logger->info("默认参数如下:");
-    my_logger->info("宽度：{}",W);
-    my_logger->info("高度：{}",H);
-    my_logger->info("方向网格数：{}",x_N);
-    my_logger->info("方向网格数：{}",y_N);
-    my_logger->info("传热：{}",q);
-    my_logger->info("热导率：{}",k);
-    my_logger->info("顶部温度：{}",T_top);
 }
 
 /**
@@ -166,7 +154,6 @@ void TDHeat::construction()
             a[i][i+1] = a1_x;
             a[i][i+x_N] = a1_y;
             a[i][i-x_N] = a1_y;
-            // a[i][x_N*y_N] = 0;
             b[i] = 0;
         }else if((floor(i/x_N) == 0) && (i!=0) && (i!=(x_N-1)))
         {
@@ -175,7 +162,6 @@ void TDHeat::construction()
             a[i][i-1] = a1_x;
             a[i][i+1] = a1_x;
             a[i][i+x_N] = a1_y;
-            // a[i][x_N*y_N] = 0;
             b[i] = 0;
         }else if(((i+1)%x_N == 0) && (i!=(x_N-1)) && (floor(i/x_N) != (y_N-1)))
         {
@@ -193,7 +179,6 @@ void TDHeat::construction()
             a[i][i+1] = a1_x;
             a[i][i-1] = a1_x;
             a[i][i-x_N] = a1_y;
-            // a[i][x_N*y_N] = b3;
             b[i] = b3;
         }else if((i%x_N == 0) && (floor(i/x_N) != 0) && (floor(i/x_N) != (y_N-1)))
         {
@@ -202,7 +187,6 @@ void TDHeat::construction()
             a[i][i+1] = a1_x;
             a[i][i-x_N] = a1_y;
             a[i][i+x_N] = a1_y;
-            // a[i][x_N*y_N] = b4;
             b[i] = b4;
         }else if((floor(i/x_N) == 0) && (i%x_N == 0))
         {
@@ -210,7 +194,6 @@ void TDHeat::construction()
             a[i][i] = ac5;
             a[i][i+1] = a1_x;
             a[i][i+x_N] = a1_y;
-            // a[i][x_N*y_N] = b5;
             b[i] = b5;
         }else if(floor(i/x_N) == 0 && ((i+1)%x_N == 0))
         {
@@ -225,7 +208,6 @@ void TDHeat::construction()
             a[i][i] = ac7;
             a[i][i-1] = a1_x;
             a[i][i-x_N] = a1_y;
-            // a[i][x_N*y_N] = b7;
             b[i] = b7;
         }else if((i%x_N == 0) && (floor(i/x_N) == (y_N-1)))
         {
@@ -233,20 +215,17 @@ void TDHeat::construction()
             a[i][i] = ac8;
             a[i][i+1] = a1_x;
             a[i][i-x_N] = a1_y;
-            // a[i][x_N*y_N] = b8;
             b[i] = b8;
         }else
         {
             std::cout << "出错" << std::endl;
         }
     };
-    // myTool::printVector_2d(a,"填充后");
-    dbg(a);
-    // T = myTool::solveGuauss(a,x_N*y_N);
+     myTool::printVector_2d(a,"填充后");
     T.resize(x_N * y_N);
     double eps = 1e-6;
     myTool::GaussSeidel(a,b,T,eps);
-    myTool::printVector_1d(T);
+    myTool::printVector_1d(T,"T");
     myTool::solveBodyHeart(bodyHeart,W,H,x_N,y_N);
 }
 
@@ -279,40 +258,18 @@ void TDHeat::plotImg()
         jindex = floor(k/x_N);
         Z[jindex][iindex] = T[k];
     };
-    // int iindex;
-    // int jindex;
-    // for(int k = 0; k < x_N*y_N; ++k)
-    // { 
-    //     // for(int m = 0; m < y_N * x_N; ++m)
-    //     // {
-    //     //     for(int n = 0; n < y_N * x_N; ++n)
-    //     //     {
-    //     //         if((m<(k+1)*x_N) && (n<(k+1)*y_N))
-    //     //         {
-    //     //             Z[m][n] = T[k];
-    //     //         }
-    //     //     };
-    //     // };
-    //     iindex = k % x_N;
-    //     jindex = floor(k/x_N);
-    //     for(int i = jindex*x_N; i < (jindex+1)*x_N; ++i)
-    //     {
-    //         for(int j = iindex*y_N; j < (iindex+1)*y_N; ++j)
-    //         {
-    //             Z[i][j] = T[k];
-    //         };
-    //     };
-    // };
+
     myTool::printVector_2d(Z,"温度矩阵");
     myTool::printVector_2d(X,"X轴");
     myTool::printVector_2d(Y,"Y轴");
     std::vector<double> tem = {10.0,20,30};
-    plt::contourf(X,Y,Z,100);
+    auto f = plt::figure();
+    auto ax = f->current_axes();
+    ax->hold(true);
+    ax->contourf(X,Y,Z,100);
+    ax->hold(false);
     plt::colorbar()
         .limits({100,300});
-        // .tick_values({30,90,150,210,270})
-        // .ticklabels({"cold","cool","neutral","warm","hot"})
-        // .label("温度等高线图");
     plt::show();
 }
 
